@@ -13,6 +13,7 @@ const refs = {
 };
 
 let intervalId = null;
+let selectedDate = null;
 refs.start.disabled = true;
 refs.input.disabled = false;
 
@@ -22,6 +23,7 @@ const options = {
     defaultDate: new Date(),
     minuteIncrement: 1,
     onClose(selectedDates) {
+        selectedDate = selectedDates[0];
         console.log(selectedDates[0]);
         if (selectedDates[0] < new Date()) {
             refs.start.disabled = true;
@@ -33,27 +35,32 @@ const options = {
         } else {
             refs.start.disabled = false;
         }
-        refs.start.addEventListener('click', () => {
-            intervalId = setInterval(() => {
-                const differenceInTime = selectedDates[0] - new Date();
 
-                if (differenceInTime < 1000) {
-                    clearInterval(intervalId);
-                }
-                const result = convertMs(differenceInTime);
-                viewOfTimer(result);
-            }, 1000);
-
-            if (intervalId) {
-                refs.start.disabled = true;
-                refs.input.disabled = true;
-            }
-
-        });
     },
 };
 flatpickr('#datetime-picker', options);
 
+refs.start.addEventListener('click', () => {
+    if (!selectedDate) {
+        return;
+    }
+
+    intervalId = setInterval(() => {
+        const differenceInTime = selectedDate - new Date();
+
+        if (differenceInTime <= 0) {
+            clearInterval(intervalId);
+            refs.input.disabled = false;
+            return;
+        }
+
+        const result = convertMs(differenceInTime);
+        viewOfTimer(result);
+    }, 1000);
+
+    refs.start.disabled = true;
+    refs.input.disabled = true;
+});
 
 function viewOfTimer({ days, hours, minutes, seconds }) {
     refs.days.textContent = `${days}`;
@@ -79,3 +86,4 @@ function convertMs(ms) {
 
     return { days, hours, minutes, seconds };
 }
+

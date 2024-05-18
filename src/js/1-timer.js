@@ -15,7 +15,7 @@ const refs = {
 let intervalId = null;
 let selectedDate = null;
 refs.start.disabled = true;
-refs.input.disabled = false;
+
 
 const options = {
     enableTime: true,
